@@ -4,6 +4,16 @@
 	<link rel='stylesheet' href="{{ URL::asset('assets/libs/datatables-1.10.20/datatables-1.10.20/css/jquery.dataTables.min.css') }}">
 	<link rel='stylesheet' href="{{ URL::asset('assets/libs/datatables-1.10.20/Responsive-2.2.3/css/responsive.dataTables.min.css') }}">
 	<link rel="stylesheet" href="{{ URL::asset('assets/libs/select2-4.0.13/dist/css/select2.min.css') }}">
+	{{ $dataTable->scripts() }}
+	<?php
+	$ts = time();
+	$signature = "bd6efdd618ef8e481ba2e247b10735b801fbdefe";
+	$uid = Auth::user()->id;
+	$sig = sha1($uid.$ts.$signature);
+	$url_gen_lab = "http://viral.ddc.moph.go.th/viral/token.php?uid=".$uid."&ts=".$ts."&sig=".$sig."&typelab=1";
+	$url_lab_result = "http://viral.ddc.moph.go.th/viral/token.php?uid=".$uid."&ts=".$ts."&sig=".$sig."&typelab=2";
+	// dd($url_gen_lab);
+	?>
 @endsection
 @section('internal-style')
 <style>
@@ -137,14 +147,18 @@ table.dataTable tr.even{ background-color: white; border:1px lightgrey; }
 							}
 						});
 						break;
-					case 'labGen':
-						window.open('<?php echo $url_gen_lab; ?>&idx=' + contact_id, '_blank');
-						// window.open('http://viral.ddc.moph.go.th/viral/lab/genlab.php?idx=' + contact_id, '_blank');
-						break;
-					case 'labResult':
-					window.open('<?php echo $url_lab_result; ?>&idx=' + contact_id, '_blank');
-						// window.open('http://viral.ddc.moph.go.th/viral/lab/labfollow.php?idx=' + contact_id, '_blank');
-						break;
+
+				case 'labSendColab':
+					//window.open('<php echo $url_gen_lab;>&idx=' + satid, '_blank');
+					let labSendUrl = '{{ route('colab.send', ':id') }}';
+					labSendUrl = labSendUrl.replace(':id', id);
+					window.open(labSendUrl, '_blank');
+					break;
+				case 'labResultColab':
+					let labResultUrl = '{{ route('colab.result', ':id') }}';
+					labResultUrl = labResultUrl.replace(':id', id);
+					window.open(labResultUrl, '_blank');
+					break;
 					// case 'contact':
 					// 	let cturl = '{{ route("contacttable", ":id") }}';
 					// 	cturl = cturl.replace(':id', id);
@@ -175,7 +189,8 @@ table.dataTable tr.even{ background-color: white; border:1px lightgrey; }
 			items: {
 				"chStatus": {name: "Change status", icon: "fas fa-check-circle"},
 				"sep1": "---------",
-				"labGen": {name: "Generate lab", icon: "fas fa-barcode"},
+				"labSendColab": {name: "ส่งแลป", icon: "fas fa-external-link-alt", className: 'link-colab'},
+				// "labGen": {name: "Generate lab", icon: "fas fa-barcode"},
 				"labResult": {name: "Lab result", icon: "fas fa-flask"},
 				// "contact": {name: "Contact", icon: "fas fa-handshake"},
 				"sep2": "---------",

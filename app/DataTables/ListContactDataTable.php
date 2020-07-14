@@ -299,6 +299,8 @@ class ListContactDataTable  extends DataTable
 									->orderBy('id');
 
 									break;
+
+									
 									case 'hos':
 										$contact = ContactList::select(
 											'id',
@@ -306,8 +308,8 @@ class ListContactDataTable  extends DataTable
 											'sat_id',
 											'contact_id',
 											'age_contact',
-											\DB::raw('(CASE '.$risk_contact.' ELSE "ไม่ระบุความเสี่ยง" END) AS risk_contact'),
 											'phone_contact',
+											\DB::raw('(CASE '.$risk_contact.' ELSE "ไม่ระบุความเสี่ยง" END) AS risk_contact'),
 											\DB::raw('(CASE '.$status_followup.' ELSE "อยู่ระหว่างการติดตาม" END) AS status_followup'),
 											\DB::raw("CONCAT(name_contact, ' ', lname_contact) as full_name"),
 											\DB::raw('(CASE '.$province.' ELSE "-" END) AS province'),

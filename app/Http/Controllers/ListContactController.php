@@ -20,6 +20,117 @@ class ListContactController extends Controller
 	public function index(ListContactDataTable $dataTable) {
 		return $dataTable->render('list-data.contact');
 	}
+	public function colabSend(Request $request) {
+		try {
+			$data_contact = ContactList::select('id', 'sat_id', 'card_id', 'passport', 'mobile', 'pt_status')
+													->where('id', '=', $request->id)
+													->get();
+			// dd($data_contact);
+			$firstname = self::addHyphen(auth()->user()->name);
+
+			$lastname = self::addHyphen(auth()->user()->lname);
+			$email = self::addHyphen(auth()->user()->email);
+			$userMobile = self::addHyphen(auth()->user()->tel);
+			$patientHN =  self::addHyphen($data_contact[0]->hn);
+			$patientSatCode = self::addHyphen($data_contact[0]->sat_id);
+			$patientCID = self::addHyphen($data_contact[0]->contact_cid);
+			$patientPassport = self::addHyphen($data_contact[0]->passport_contact);
+			$patientMobile = self::addHyphen($data_contact[0]->phone_contact);
+			$hospcode = self::addHyphen(auth()->user()->hospcode);
+			$send_url = Helper::url_query('https://co-lab.moph.go.th/COLAB/Callback.aspx', [
+			//$send_url = Helper::url_query('https://apps.boe.moph.go.th/test/pj.php', [
+				'UserName'=> auth()->user()->username,
+				'FirstName' => $firstname,
+				'LastName' => $lastname,
+				'Email' => $email,
+				'UserMobile' => $userMobile,
+				'UserPosition' => '-',
+				'ScreenType' => 'detail',
+				'DDCPatientID' => $data[0]->id,
+				'PatientDDCType' => '3',
+				'PatientHN' =>  '-',
+				'PatientSatCode' => $patientSatCode,
+				'PatientCID' => $patientCID,
+				'PatientPassport' => $patientPassport,
+				'PatientMobile' => $patientMobile,
+				'HospitalCode' => $hospcode
+			]);
+
+			/* log to sent */
+			if (count($data_contact) > 0) {
+				$today = date('Y-m-d H:i:s');
+				DB::table('log_colab')->insert([
+					'ref_pt_id' => $request->id,
+					'sat_id' => $data_contact[0]->sat_id,
+					'send_method' => 'GET',
+					'send_url' => $send_url,
+					'send_date' => $today,
+					'ref_user_id' => Auth::user()->id,
+					'created_at' => $today
+				]);
+
+				/* update invest pt after sent */
+				$inv = $data_contact::find($request->id);
+				$inv->colab_send = 'Y';
+				$inv->save();
+
+			} else {
+				$send_url = 0;
+			}
+			return redirect($send_url);
+		} catch(\Exception $e) {
+			Log::error(sprintf("%s - line %d - ", __FILE__, __LINE__).$e->getMessage());
+		}
+	}
+
+	public function colabResult(Request $request) {
+		try {
+			$data_contact = ContactList::select('id', 'sat_id', 'card_id', 'passport', 'mobile', 'pt_status')
+													->where('id', '=', $request->id)
+													->get();
+			// dd($data_contact);
+			$firstname = self::addHyphen(auth()->user()->name);
+
+			$lastname = self::addHyphen(auth()->user()->lname);
+			$email = self::addHyphen(auth()->user()->email);
+			$userMobile = self::addHyphen(auth()->user()->tel);
+			$patientHN =  self::addHyphen($data_contact[0]->hn);
+			$patientSatCode = self::addHyphen($data_contact[0]->sat_id);
+			$patientCID = self::addHyphen($data_contact[0]->contact_cid);
+			$patientPassport = self::addHyphen($data_contact[0]->passport_contact);
+			$patientMobile = self::addHyphen($data_contact[0]->phone_contact);
+			$hospcode = self::addHyphen(auth()->user()->hospcode);
+			//$send_url = Helper::url_query('https://apiservice.ddc.moph.go.th/ddc-ilab/Send-CoLab', [
+			$send_url = Helper::url_query('https://co-lab.moph.go.th/COLAB/Callback.aspx', [
+			//$send_url = Helper::url_query('https://apps.boe.moph.go.th/test/pj.php', [
+			'UserName'=> auth()->user()->username,
+			'FirstName' => $firstname,
+			'LastName' => $lastname,
+			'Email' => $email,
+			'UserMobile' => $userMobile,
+			'UserPosition' => '-',
+			'ScreenType' => 'detail',
+			'DDCPatientID' => $data[0]->id,
+			'PatientDDCType' => '1',
+			'PatientHN' =>  '-',
+			'PatientSatCode' => $patientSatCode,
+			'PatientCID' => $patientCID,
+			'PatientPassport' => $patientPassport,
+			'PatientMobile' => $patientMobile,
+			'HospitalCode' => $hospcode
+		]);
+		return redirect($send_url);
+	} catch(\Exception $e) {
+		Log::error(sprintf("%s - line %d - ", __FILE__, __LINE__).$e->getMessage());
+	}
+}
+
+	private function addHyphen($str) {
+		if (empty($str) || is_null($str) || (strlen($str) <= 0) || $str == "") {
+			$str = "-";
+		}
+		return $str;
+	}
 
 	public function chStatus(Request $request) {
 		$fucon = FollowContactLists::select(

@@ -197,7 +197,6 @@ public function allcontacttable(Request $req)
 	$count_data = $this->arr_pts();
 	$arr_status_followup = $this->arr_status_followup();
 	$arr_risk_contact=$this->arr_risk_contact();
-
 	$ref_pt_status=DB::table('ref_pt_status')->select('pts_id','pts_name_en')->get();
 	$patian_data=DB::table('invest_pt')->select('*')->where('id', [$req->id] )->get();
 	$contact_data_val= DB::table('patient_relation')
