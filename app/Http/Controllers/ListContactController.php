@@ -7,9 +7,50 @@ use App\DataTables\ListContactDataTable;
 use App\ContactList;
 use App\FollowContactLists;
 use App\Http\Controllers\MasterController;
-
+use GuzzleHttp\Client;
+// use Illuminate\Support\Facades\Http;
 class ListContactController extends Controller
 {
+	public function postGuzzleRequest()
+{
+	$client = new Client(['base_uri' => 'http://httpbin.org/']);
+	$data = array('field_name' => 'abc',
+								'other_field' => '123',
+								);
+	$response = $client->request('POST', 'post', [
+	    'form_params' => $data,
+			'Accept'     => 'application/json',
+	]);
+
+	echo $response->getBody();
+	 	// echo	$response->getStatusCode();
+//     $client = new \GuzzleHttp\Client();
+// 		$url = 'http://test.com/users';
+// 		$data = [
+//         		'form_params' => [
+//             											'email' => 'test@gmail.com',
+//             											'name' => 'Test user',
+//             											'password' => 'testpassword'
+//         ]
+// 			];
+//     // $request = $client->get('http://test.com/users',$data);
+// // dd($data);
+// $request =  $client->get($url,[$data, 'headers' => ['Content-type' => 'application/json']]);
+// $request->setBody($data); #set body!
+// $response = $request->send();
+//
+// return $response;
+    // $response = $request->getStatusCode();
+		// $response = $request->getReasonPhrase();
+
+		// dd($response);
+		// $data = $request->json();
+// echo gettype($data);
+    // echo gettype($response);
+		// exit;
+}
+	// $response = \Guzzle::get('https://google.com');
+// echo $response->getBody();
 	public function __construct() {
 		$this->middleware('auth');
 		$this->middleware('onlyOneUser');
@@ -111,7 +152,7 @@ class ListContactController extends Controller
 			'UserPosition' => '-',
 			'ScreenType' => 'detail',
 			'DDCPatientID' => $data[0]->id,
-			'PatientDDCType' => '1',
+			'PatientDDCType' => '3',
 			'PatientHN' =>  '-',
 			'PatientSatCode' => $patientSatCode,
 			'PatientCID' => $patientCID,

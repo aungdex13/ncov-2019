@@ -505,10 +505,17 @@ if(auth()->user()->id==Auth::user()->id){
 		$ref_global_country=DB::table('ref_global_country')->select('country_id','country_name')->get();
 		$ref_lab=DB::table('laboratory')->select('id','th_name')->get();
 		$sat_id=DB::table('invest_pt')->select('sat_id','id')->where('id', $pui_id )->get();
+		// dd($sat_id);
 		$sat_id_confirm=DB::table('invest_pt')
 										->select('id','sat_id','first_name','last_name','nation')
 										->where('pt_status' ,"=" ,"2" )
 										->get();
+		$getdata_contact=DB::table('tbl_contact')
+											->select('id','sat_id','contact_id','name_contact','lname_contact')
+											->where('contact_id' ,"!=" ,null )
+											->where('risk_contact' ,"=" ,"1" )
+											->where('deleted_at' ,"=" ,null )
+											->get();
 		$sat_id_relation=DB::table('patient_relation')
 												->select('id','sat_id','contact_id')
 												->where('pui_id' , $pui_id )
@@ -544,7 +551,70 @@ if(auth()->user()->id==Auth::user()->id){
 			'arr_laboratory',
 			'ref_lab',
 			'contact_type',
-			'listoccupation'
+			'listoccupation',
+			'getdata_contact'
+    ));
+	}
+
+	// form contact add
+  public function addcontactnonsatid(Request $req)
+	{
+		$contact_id = $req ->input ('contact_id');
+		$pui_id=$req->id;
+		$ref_title_name=DB::table('ref_title_name')->select('*')->get();
+		$ref_specimen=DB::table('ref_specimen')->select('*')->get();
+		$ref_global_country=DB::table('ref_global_country')->select('country_id','country_name')->get();
+		$ref_lab=DB::table('laboratory')->select('id','th_name')->get();
+		$sat_id=DB::table('invest_pt')->select('sat_id','id')->where('id', $pui_id )->get();
+		// dd($sat_id);
+		$sat_id_confirm=DB::table('invest_pt')
+										->select('id','sat_id','first_name','last_name','nation')
+										->where('pt_status' ,"=" ,"2" )
+										->get();
+		$getdata_contact=DB::table('tbl_contact')
+											->select('id','sat_id','contact_id','name_contact','lname_contact')
+											->where('contact_id' ,"!=" ,null )
+											->where('risk_contact' ,"=" ,"1" )
+											->where('deleted_at' ,"=" ,null )
+											->get();
+											// dd($getdata_contact);
+		$sat_id_relation=DB::table('patient_relation')
+												->select('id','sat_id','contact_id')
+												->where('pui_id' , $pui_id )
+												->where('contact_id' , $contact_id )
+												->get();
+		$arr_province=$this->arr_province();
+		$arr_hos=$this->arr_hos();
+		$arr_followup_address=$this->arr_followup_address();
+    $listprovince=$this->province();
+		$contact_type=$this->contact_type();
+		$nation_list = $this->arrnation();
+    $listcountry=$this->arrnation();
+		$arr_laboratory=$this->arr_laboratory();
+		$listoccupation=$this->listoccupation();
+		$entry_user = Auth::user()->id;
+		$prefix_sat_id = Auth::user()->prefix_sat_id;
+		return view('form.contact.addcontactnonsatid',compact(
+      'listprovince',
+      'listcountry',
+			'ref_title_name',
+			'ref_specimen',
+			'ref_global_country',
+			'sat_id',
+			'prefix_sat_id',
+			'entry_user',
+			'pui_id',
+			'sat_id_confirm',
+			'nation_list',
+			'sat_id_relation',
+			'arr_province',
+			'arr_hos',
+			'arr_followup_address',
+			'arr_laboratory',
+			'ref_lab',
+			'contact_type',
+			'listoccupation',
+			'getdata_contact'
     ));
 	}
 
@@ -844,6 +914,8 @@ if(auth()->user()->id==Auth::user()->id){
 	  }
 
   public function contactinsert(Request $req){
+	$patient_type_of_contact = $req ->input ('pa1');
+// dd($patient_type_of_contact);
 	 $contact_id = $req ->input ('contact_id');
  	 $contact_id_temp = $req ->input ('contact_id_temp');
 	 // dd($contact_id_temp);
@@ -995,24 +1067,51 @@ if(auth()->user()->id==Auth::user()->id){
 			);
 			$res2	= DB::table('tbl_followup')->insert($data_followup);
 			// $res2 = $data_followup;
-			$sat_id_relation = $req->input('sat_id_relation');
-			$pui_id_r= $req->input('pui_id_r');
-			$contact_id_code =$req->input('contact_code');
-			$contact_rid =$last_res1_insert_id;
-			$contact_id =$req->input('contact_id');
-			$create_date=date('Y-m-d');
-				for ($i=0; $i < count($sat_id_relation); $i++) {
-					$exp = explode('|', $sat_id_relation[$i]);
-					$sat_id_relation_arr[$i] = $exp;
-					$data_pt[]  = [
-								'contact_rid'=>$contact_rid,
-								'contact_id'=>$contact_id,
-								'pui_id'=>$sat_id_relation_arr[$i][1],
-								'sat_id'=>$sat_id_relation_arr[$i][0],
-								'create_date' => $create_date
-											];
-				}
-				$res3	= DB::table('patient_relation')->insert($data_pt);
+			$patient_type_of_contact = $req ->input ('pa1');
+			// dd($patient_type_of_contact);
+			if ($patient_type_of_contact == "sat") {
+				$sat_id_relation = $req->input('sat_id_relation');
+				$contact_id_relation = $req->input('contact_id_relation');
+				$pui_id_r= $req->input('pui_id_r');
+				$contact_id_code =$req->input('contact_code');
+				$contact_rid =$last_res1_insert_id;
+				$contact_id =$req->input('contact_id');
+				$create_date=date('Y-m-d');
+					for ($i=0; $i < count($sat_id_relation); $i++) {
+						$exp = explode('|', $sat_id_relation[$i]);
+						$sat_id_relation_arr[$i] = $exp;
+						$data_pt[]  = [
+									'contact_rid'=>$contact_rid,
+									'contact_id'=>$contact_id,
+									'pui_id'=>$sat_id_relation_arr[$i][1],
+									'sat_id'=>$sat_id_relation_arr[$i][0],
+									'create_date' => $create_date
+												];
+					}
+					$res3	= DB::table('patient_relation')->insert($data_pt);
+			}
+			else {
+				$sat_id_relation = $req->input('sat_id_relation');
+				$contact_id_relation = $req->input('contact_id_relation');
+				// $host_contact_id = $req->input('host_contact_id');
+				$pui_id_r= $req->input('pui_id_r');
+				$contact_id_code =$req->input('contact_code');
+				$contact_rid =$last_res1_insert_id;
+				$contact_id =$req->input('contact_id');
+				$create_date=date('Y-m-d');
+					for ($i=0; $i < count($contact_id_relation); $i++) {
+						$exp = explode('|', $contact_id_relation[$i]);
+						$contact_id_relation_arr[$i] = $exp;
+						$data_contact_re[]  = [
+									'contact_rid'=>$contact_rid,
+									'contact_id'=>$contact_id,
+									'host_contact_id'=>$contact_id_relation_arr[$i][0],
+									'host_id'=>$contact_id_relation_arr[$i][1],
+									'create_date' => $create_date
+												];
+					}
+					$res3	= DB::table('contact_relation')->insert($data_contact_re);
+			}
 				// $res3 = $data_pt ;
 				$pui_id = $req->input('pui_id');
 				$no_lab1 = $req->input('no_lab1');
@@ -1063,13 +1162,13 @@ if(auth()->user()->id==Auth::user()->id){
 				 $res4	= DB::table('tbl_contact_hsc')->insert($data_lab2);
 			 }
 			 if ($no_lab1 =="") {
-			 return redirect()->route('contacttable',[$pui_id])->with('alert', 'เพิ่มข้อมูลสำเร็จ');
+			 return redirect()->route('contact',[$pui_id])->with('alert', 'เพิ่มข้อมูลสำเร็จ');
 			}
 			if ($no_lab2 =="") {
-			return redirect()->route('contacttable',[$pui_id])->with('alert', 'เพิ่มข้อมูลสำเร็จ');
+			return redirect()->route('contact',[$pui_id])->with('alert', 'เพิ่มข้อมูลสำเร็จ');
 		 }
 			 else{
-				 return redirect()->route('contacttable',[$pui_id])->with('alert', 'เพิ่มข้อมูลสำเร็จ');
+				 return redirect()->route('contact',[$pui_id])->with('alert', 'เพิ่มข้อมูลสำเร็จ');
 			 }
 	}
 

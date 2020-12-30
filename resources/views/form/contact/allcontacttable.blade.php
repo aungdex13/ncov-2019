@@ -112,7 +112,7 @@ input.valid, textarea.valid{
 					</div>
 </br>
 					<div class="col-md-12">
-						{{-- <a class="btn btn-success" target="_blank" href="{{ route('addcontact',$id) }}">
+						{{-- <a class="btn btn-success" target="_blank" href="{{ route('addcontact') }}">
 							Add Contact
 						</a> --}}
 						{{-- <a class="btn btn-info" target="_blank" href="{{ route('contactexport',$id) }}">

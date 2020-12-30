@@ -60,7 +60,7 @@ $contact_id = Haruncpi\LaravelIdGenerator\IdGenerator::generate($config);
                                     </div>
                                 <div class="form-group row">
                                     <div class="col-sm-12 col-md-6">
-                                        <input type="hidden" name="sat_id" value="{{$sat_id[0]->sat_id}}" class="form-control" readonly>
+                                        <input type="hidden" name="sat_id"  class="form-control" readonly>
                                           <h5 class="sub-title">รหัสผู้สัมผัส : </h5>
                                         <div class="col-sm-12 col-md-6">
                                               {{-- <h5 class="card-title"><input type="checkbox" id="cuscontactid" name="cuscontactid" /> :  กรณีกรอกรหัสผู้สัมผัสด้วยตนเอง  </h5>
@@ -72,24 +72,24 @@ $contact_id = Haruncpi\LaravelIdGenerator\IdGenerator::generate($config);
                                     </div>
                                   </div>
                                   <div>
-                                    <h5 class="card-title">ผู้สัมผัสของผู้ป่วยรหัส : {{$sat_id[0]->sat_id}}</h5>
+                                    {{-- <h5 class="card-title">ผู้สัมผัสของผู้ป่วยรหัส : {{$sat_id[0]->sat_id}}</h5> --}}
                                     {{-- <h4 class="card-title">และ รหัส:<br>
                                     @foreach ($sat_id_relation as $row)
                                     {{$row->sat_id}}<br>
                                     @endforeach
                                   </h4> --}}
                                   </div>
-                                <h5 class="sub-title">เพิ่มผู้ป่วยของผู้สัมผัส กรณีเป็นผู้สัมผัสของผู้ป่วยหลายราย</h5>
+                                <h5 class="sub-title">เพิ่มผู้ป่วยของผู้สัมผัส</h5>
                                 <div class="form-group row">
                                     <div class="col-sm-3">
-                                        <input type="radio" name="pa1" value="sat" onclick="show21();" checked> ไม่มี
+                                        <input type="radio" name="pa1" value="pui" onclick="show21();" checked> ผู้ป่วย
                                     </div>
                                     <div class="col-sm-3">
-                                        <input type="radio" name="pa1" value="contact" onclick="show22();"> มี
+                                        <input type="radio" name="pa1" value="contact" onclick="show22();" > ผู้สัมผัส
                                     </div>
 
                                 </div>
-                                <div id="div21" class="hide">
+                                <div id="div21">
                                 <div class="form-group row">
                                     <div class="col-sm-12 col-md-6">
                                         <select multiple="multiple" size="10" name="sat_id_relation[]">
@@ -97,7 +97,7 @@ $contact_id = Haruncpi\LaravelIdGenerator\IdGenerator::generate($config);
                                           <option value="{{$row->sat_id.'|'.$row->id}}">{{ (isset($row->sat_id)) ? $row->sat_id : "" }} [{{ (isset($row->first_name)) ? $row->first_name : "" }} {{ (isset($row->last_name)) ? $row->last_name : "" }}/{{ (isset($nation_list[$row->nation])) ? $nation_list[$row->nation] : "" }}]
                                           </option>
                                           @endforeach
-                                          <option value="{{$sat_id[0]->sat_id.'|'.$sat_id[0]->id}}" selected>รหัสตั้งต้นผู้ป่วยหลัก {{$sat_id[0]->sat_id}}</option>
+                                          {{-- <option value="{{$sat_id[0]->sat_id.'|'.$sat_id[0]->id}}" selected>รหัสตั้งต้นผู้ป่วยหลัก {{$sat_id[0]->sat_id}}</option> --}}
                                         </select>
                                         <br>
                                     </div>
@@ -106,7 +106,7 @@ $contact_id = Haruncpi\LaravelIdGenerator\IdGenerator::generate($config);
                               <div id="div22" class="hide">
                               <div class="form-group row">
                                   <div class="col-sm-12 col-md-6">
-                                      <select multiple="multiple" size="10" name="sat_id_relation[]">
+                                      <select multiple="multiple" size="10" name="contact_id_relation[]">
                                         @foreach ($getdata_contact as $row)
                                         <option value="{{$row->contact_id.'|'.$row->id}}">{{ (isset($row->contact_id)) ? $row->contact_id : "" }} [{{ (isset($row->name_contact)) ? $row->name_contact : "" }} {{ (isset($row->lname_contact)) ? $row->lname_contact : "" }}]
                                         </option>
@@ -742,16 +742,16 @@ $("#checkBoxID2").click(function() {
     }
 </script>
 <script>
-function show21() {
-    document.getElementById('div21').style.display = 'block';
-    document.getElementById('div22').style.display = 'none';
-}
+    function show21() {
+        document.getElementById('div21').style.display = 'block';
+        document.getElementById('div22').style.display = 'none';
+    }
 
-function show22() {
-    document.getElementById('div21').style.display = 'none';
-    document.getElementById('div22').style.display = 'block';
+    function show22() {
+        document.getElementById('div21').style.display = 'none';
+        document.getElementById('div22').style.display = 'block';
 
-}
+    }
 </script>
 <script>
     // In your Javascript (external .js resource or <script> tag)
@@ -780,6 +780,13 @@ function show22() {
 var demo1 = $('select[name="sat_id_relation[]"]').bootstrapDualListbox();
 $("#demoform").submit(function() {
   alert($('[name="sat_id_relation[]"]').val());
+  return false;
+});
+</script>
+<script>
+var demo1 = $('select[name="contact_id_relation[]"]').bootstrapDualListbox();
+$("#demoform").submit(function() {
+  alert($('[name="contact_id_relation[]"]').val());
   return false;
 });
 </script>

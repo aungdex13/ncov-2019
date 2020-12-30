@@ -70,6 +70,7 @@ Route::get('/contactfollowtable', 'ContactController@contactfollowtable')->name(
 	Route::get('/contact/list', 'ListContactController@index')->name('list-data.contact');
 	Route::post('ch-status-con', 'ListContactController@chStatus')->name('ch-status-con');
 Route::get('/addcontact/id/{id}', 'ContactController@addcontact')->name('addcontact');
+Route::get('/addcontactnonsatid', 'ContactController@addcontactnonsatid')->name('addcontactnonsatid');
 Route::get('/allcontacttable', 'ContactController@allcontacttable')->name('allcontacttable');
 // Route::get('/editcontact/pui_id/{pui_id}/contact_rid/{contact_rid}', 'ContactController@editcontact')->name('editcontact');
 Route::get('/editcontact/id/{id}', 'ContactController@editcontact')->name('editcontact');
@@ -89,6 +90,10 @@ Route::post('/contact_st_update', 'ContactController@contactstupdate')->name('co
 Route::post('/allcontactstupdate', 'ContactController@allcontactstupdate')->name('allcontactstupdate');
 
 route::get('contactexport/id/{id}', 'ExportContactController@export')->name('contactexport');
+
+Route::get('/colab/send/{id}', 'ListContactController@colabSend')->name('colab.send');
+Route::get('/colab/result/{id}', 'ListContactController@colabResult')->name('colab.result');
+Route::get('postGuzzleRequest', 'ListContactController@postGuzzleRequest')->name('postGuzzleRequest');
 
 // excel download
 route::post('satexport', 'ExportSATController@satexport')->name('satexport');

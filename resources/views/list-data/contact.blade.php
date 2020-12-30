@@ -64,11 +64,20 @@ table.dataTable tr.even{ background-color: white; border:1px lightgrey; }
 	</div>
 </div>
 <div class="container-fluid">
+	<div class="col-md-12">
+		<a class="btn btn-success" target="_blank" href="{{ route('addcontactnonsatid') }}">
+			Add Contact
+		</a>
+		{{-- <a class="btn btn-info" target="_blank" href="{{ route('contactexport',$id) }}">
+			export Contact
+		</a> --}}
+	</div>
 	<!-- Modal change status-->
 	<div class="modal fade" id="chstatus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<form name="chStatusFrm" action="{{ route('contact_st_update') }}" method="POST">
 				{{ csrf_field() }}
+
 				<div class="modal-content" id="ajax-status"></div>
 			</form>
 		</div>
@@ -150,7 +159,8 @@ table.dataTable tr.even{ background-color: white; border:1px lightgrey; }
 
 				case 'labSendColab':
 					//window.open('<php echo $url_gen_lab;>&idx=' + satid, '_blank');
-					let labSendUrl = '{{ route('colab.send', ':id') }}';
+					// let labSendUrl = '{ route('colab.send', ':id') }}';
+					let labSendUrl = '{{ route('postGuzzleRequest') }}';
 					labSendUrl = labSendUrl.replace(':id', id);
 					window.open(labSendUrl, '_blank');
 					break;
